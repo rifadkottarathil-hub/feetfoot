@@ -32,9 +32,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env*.example
 
 # vercel
 .vercel
+
+# original, uncompressed source media (kept locally for re-encoding, not deployed)
+/assets-source
 
 # typescript
 *.tsbuildinfo
