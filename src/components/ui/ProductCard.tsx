@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/lib/types";
 import { productImage, productImageCount } from "@/lib/productImage";
-import { formatInr } from "@/lib/format";
+import { priceLabel } from "@/lib/format";
 import SmartImage from "@/components/ui/SmartImage";
 
 const CARD_SIZES = "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 50vw";
 
 export default function ProductCard({ product }: { product: Product }) {
   const [hovered, setHovered] = useState(false);
-  const onSale = typeof product.salePrice === "number";
+  const price = priceLabel(product);
   const secondImageAvailable = productImageCount(product) > 1;
 
   return (
@@ -44,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
 
         <div className="absolute left-3 top-3 flex gap-2">
-          {onSale && (
+          {price.onSale && (
             <span className="bg-accent px-2 py-1 text-xs font-bold uppercase tracking-wide text-white">
               Sale
             </span>
@@ -61,12 +61,14 @@ export default function ProductCard({ product }: { product: Product }) {
         <p className="text-xs font-bold uppercase tracking-wide text-ink/50">{product.brandName}</p>
         <p className="font-heading text-sm font-bold">{product.name}</p>
         <div className="mt-1 flex items-center gap-2">
-          <span className={`text-sm ${onSale ? "font-bold text-accent" : "font-medium"}`}>
-            {formatInr(product.salePrice ?? product.price)}
+          <span
+            className={`text-sm ${
+              price.onSale ? "font-bold text-accent" : price.hasPrice ? "font-medium" : "text-ink/60"
+            }`}
+          >
+            {price.text}
           </span>
-          {onSale && (
-            <span className="text-sm text-ink/40 line-through">{formatInr(product.price)}</span>
-          )}
+          {price.original && <span className="text-sm text-ink/40 line-through">{price.original}</span>}
         </div>
       </div>
     </Link>

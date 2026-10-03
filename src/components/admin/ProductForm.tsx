@@ -100,7 +100,7 @@ export default function ProductForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="price" className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink/50">
-            Price (₹)
+            Price (₹, optional — leave blank for &quot;Contact for price&quot;)
           </label>
           <input
             id="price"
@@ -108,8 +108,7 @@ export default function ProductForm({
             type="number"
             min={0}
             step="1"
-            required
-            defaultValue={initialValues?.price}
+            defaultValue={initialValues?.price ?? undefined}
             className="w-full border border-line bg-paper px-4 py-2.5 text-sm focus:border-ink focus:outline-none"
           />
         </div>

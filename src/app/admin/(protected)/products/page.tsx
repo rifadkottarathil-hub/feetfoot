@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getProducts } from "@/lib/data/products";
-import { formatInr } from "@/lib/format";
+import { priceLabel } from "@/lib/format";
 import ConfirmSubmitButton from "@/components/admin/ConfirmSubmitButton";
 import { deleteProduct } from "./actions";
 
@@ -31,14 +31,16 @@ export default async function AdminProductsPage() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {products.map((product) => {
+              const price = priceLabel(product);
+              return (
               <tr key={product.id} className="border-b border-line last:border-b-0">
                 <td className="px-4 py-3 font-medium">{product.name}</td>
                 <td className="px-4 py-3 text-ink/60">{product.brandName}</td>
                 <td className="px-4 py-3">
-                  {formatInr(product.salePrice ?? product.price)}
-                  {product.salePrice && (
-                    <span className="ml-1.5 text-ink/40 line-through">{formatInr(product.price)}</span>
+                  <span className={price.hasPrice ? "" : "text-ink/50"}>{price.text}</span>
+                  {price.original && (
+                    <span className="ml-1.5 text-ink/40 line-through">{price.original}</span>
                   )}
                 </td>
                 <td className="px-4 py-3 text-ink/60">
@@ -60,7 +62,8 @@ export default async function AdminProductsPage() {
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { Product } from "@/lib/types";
-import { formatInr } from "@/lib/format";
+import { priceLabel } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 import Gallery from "@/components/product/Gallery";
 import Accordion from "@/components/product/Accordion";
@@ -23,11 +24,11 @@ export default function ProductDetail({
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
   const { addItem, openCart } = useCart();
-  const onSale = typeof product.salePrice === "number";
+  const price = priceLabel(product);
   const label = `${product.brandName} ${product.name}`;
 
   const handleAddToCart = () => {
-    if (!selectedSize || product.soldOut) return;
+    if (!selectedSize || product.soldOut || product.price == null) return;
     addItem({
       slug: product.slug,
       name: product.name,
@@ -55,19 +56,21 @@ export default function ProductDetail({
           />
 
           <div className="mt-4 flex items-center gap-3">
-            <span className={`text-xl ${onSale ? "font-bold text-accent" : "font-semibold"}`}>
-              {formatInr(product.salePrice ?? product.price)}
+            <span
+              className={`text-xl ${
+                price.onSale ? "font-bold text-accent" : price.hasPrice ? "font-semibold" : "text-ink/70"
+              }`}
+            >
+              {price.text}
             </span>
-            {onSale && (
-              <span className="text-lg text-ink/40 line-through">{formatInr(product.price)}</span>
-            )}
+            {price.original && <span className="text-lg text-ink/40 line-through">{price.original}</span>}
             {product.soldOut && (
               <span className="bg-ink px-2 py-1 text-xs font-bold uppercase tracking-wide text-paper">
                 Sold out
               </span>
             )}
           </div>
-          <p className="mt-1 text-xs text-ink/50">Inclusive of GST</p>
+          {price.hasPrice && <p className="mt-1 text-xs text-ink/50">Inclusive of GST</p>}
 
           <p className="mt-4 text-sm text-ink/70">Colourway: {product.colourway}</p>
 
@@ -98,17 +101,42 @@ export default function ProductDetail({
             </div>
           </div>
 
-          <Magnetic className="mt-6 block w-full" strength={0.15}>
-            <button
-              onClick={handleAddToCart}
-              disabled={product.soldOut || !selectedSize}
-              className="w-full cursor-pointer bg-accent py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-ink/20"
-            >
-              {product.soldOut ? "Sold out" : added ? "Added to cart" : "Add to cart"}
-            </button>
-          </Magnetic>
-          {!product.soldOut && !selectedSize && (
-            <p className="mt-2 text-xs text-ink/50">Select a size to continue.</p>
+          {product.soldOut ? (
+            <Magnetic className="mt-6 block w-full" strength={0.15}>
+              <button
+                disabled
+                className="w-full cursor-not-allowed bg-ink/20 py-3.5 text-sm font-bold uppercase tracking-wide text-white"
+              >
+                Sold out
+              </button>
+            </Magnetic>
+          ) : price.hasPrice ? (
+            <>
+              <Magnetic className="mt-6 block w-full" strength={0.15}>
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!selectedSize}
+                  className="w-full cursor-pointer bg-accent py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-ink/20"
+                >
+                  {added ? "Added to cart" : "Add to cart"}
+                </button>
+              </Magnetic>
+              {!selectedSize && <p className="mt-2 text-xs text-ink/50">Select a size to continue.</p>}
+            </>
+          ) : (
+            <>
+              <Magnetic className="mt-6 block w-full" strength={0.15}>
+                <Link
+                  href="/contact"
+                  className="block w-full cursor-pointer bg-accent py-3.5 text-center text-sm font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
+                >
+                  Contact us for price
+                </Link>
+              </Magnetic>
+              <p className="mt-2 text-xs text-ink/50">
+                We&apos;ll get back to you with pricing{selectedSize ? ` for size ${selectedSize}` : ""}.
+              </p>
+            </>
           )}
 
           <div className="mt-10">

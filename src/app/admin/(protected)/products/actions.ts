@@ -23,7 +23,8 @@ function parseProductForm(formData: FormData) {
   const slugInput = String(formData.get("slug") ?? "").trim();
   const brandId = String(formData.get("brandId") ?? "");
   const category = String(formData.get("category") ?? "") as ProductCategory;
-  const price = Number(formData.get("price"));
+  const priceRaw = String(formData.get("price") ?? "").trim();
+  const price = priceRaw ? Number(priceRaw) : null;
   const salePriceRaw = String(formData.get("salePrice") ?? "").trim();
 
   return {
@@ -32,7 +33,8 @@ function parseProductForm(formData: FormData) {
     brandId,
     category,
     price,
-    salePrice: salePriceRaw ? Number(salePriceRaw) : null,
+    // A sale price only makes sense alongside a real price.
+    salePrice: price != null && salePriceRaw ? Number(salePriceRaw) : null,
     colourway: String(formData.get("colourway") ?? "").trim(),
     description: linesToArray(formData.get("description")),
     sizeFit: linesToArray(formData.get("sizeFit")),
@@ -68,8 +70,11 @@ export async function createProduct(
   formData: FormData
 ): Promise<ProductFormState> {
   const parsed = parseProductForm(formData);
-  if (!parsed.name || !parsed.brandId || !parsed.category || !parsed.price) {
-    return { error: "Name, brand, category and price are required." };
+  if (!parsed.name || !parsed.brandId || !parsed.category) {
+    return { error: "Name, brand and category are required." };
+  }
+  if (parsed.price != null && Number.isNaN(parsed.price)) {
+    return { error: "Price must be a number." };
   }
 
   let images: string[];
@@ -108,8 +113,11 @@ export async function updateProduct(
   formData: FormData
 ): Promise<ProductFormState> {
   const parsed = parseProductForm(formData);
-  if (!parsed.name || !parsed.brandId || !parsed.category || !parsed.price) {
-    return { error: "Name, brand, category and price are required." };
+  if (!parsed.name || !parsed.brandId || !parsed.category) {
+    return { error: "Name, brand and category are required." };
+  }
+  if (parsed.price != null && Number.isNaN(parsed.price)) {
+    return { error: "Price must be a number." };
   }
 
   const keepImages = formData.getAll("keepImage").map(String);
