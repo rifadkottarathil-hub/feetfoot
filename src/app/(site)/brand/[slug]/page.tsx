@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBrandBySlug } from "@/lib/data/brands";
+import { getBrandBySlug, getBrands } from "@/lib/data/brands";
 import { getProductsByBrand } from "@/lib/data/products";
 import BrandProductsClient from "@/components/brand/BrandProductsClient";
 import FadeIn from "@/components/ui/FadeIn";
 import TextReveal from "@/components/ui/TextReveal";
+
+// Pre-renders every current brand at build time so visitors never pay a
+// cold-render cost; a brand added later (no redeploy yet) still renders
+// and caches itself on its first visit, since dynamicParams defaults to true.
+export async function generateStaticParams() {
+  const brands = await getBrands();
+  return brands.map((b) => ({ slug: b.slug }));
+}
 
 export async function generateMetadata({
   params,

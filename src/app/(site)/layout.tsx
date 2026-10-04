@@ -9,7 +9,10 @@ import SmoothScroll from "@/components/layout/SmoothScroll";
 import { CartProvider } from "@/context/CartContext";
 import { getBrands } from "@/lib/data/brands";
 
-export const dynamic = "force-dynamic";
+// Pages are cached and served instantly instead of hitting Supabase on every
+// visit. The admin panel already calls revalidatePath() on every save, which
+// busts this cache immediately — this revalidate window is just a safety net.
+export const revalidate = 300;
 
 const inter = Inter({
   variable: "--font-inter",

@@ -3,6 +3,14 @@ import { notFound } from "next/navigation";
 import { getProducts, getProductBySlug, getRelatedProducts } from "@/lib/data/products";
 import ProductDetail from "@/components/product/ProductDetail";
 
+// Pre-renders every current product at build time so visitors never pay a
+// cold-render cost; a product added later (no redeploy yet) still renders
+// and caches itself on its first visit, since dynamicParams defaults to true.
+export async function generateStaticParams() {
+  const products = await getProducts();
+  return products.map((p) => ({ slug: p.slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {
