@@ -7,8 +7,8 @@ import Newsletter from "@/components/home/Newsletter";
 import ProductGrid from "@/components/ui/ProductGrid";
 import FadeIn from "@/components/ui/FadeIn";
 import TextReveal from "@/components/ui/TextReveal";
-import { getProducts } from "@/lib/data/products";
-import { getBrands } from "@/lib/data/brands";
+import { getPublicProducts } from "@/lib/data/products";
+import { getPublicBrands } from "@/lib/data/brands";
 
 export const metadata: Metadata = {
   title: "Foot Feet India | Multi-Brand Sneaker Store",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [products, brands] = await Promise.all([getProducts(), getBrands()]);
+  const [products, brands] = await Promise.all([getPublicProducts(), getPublicBrands()]);
   const newArrivals = products.filter((p) => p.newArrival).slice(0, 8);
   const bestSellers = products.filter((p) => p.bestSeller).slice(0, 4);
 

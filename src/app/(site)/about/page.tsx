@@ -3,7 +3,7 @@ import { placeholderSvg } from "@/lib/placeholder";
 import FadeIn from "@/components/ui/FadeIn";
 import TextReveal from "@/components/ui/TextReveal";
 import SmartImage from "@/components/ui/SmartImage";
-import { getBrands } from "@/lib/data/brands";
+import { getPublicBrands } from "@/lib/data/brands";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AboutPage() {
-  const brands = await getBrands();
+  const brands = await getPublicBrands();
 
   return (
     <>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBrandBySlug, getBrands } from "@/lib/data/brands";
-import { getProductsByBrand } from "@/lib/data/products";
+import { getPublicBrandBySlug, getPublicBrands } from "@/lib/data/brands";
+import { getPublicProductsByBrand } from "@/lib/data/products";
 import BrandProductsClient from "@/components/brand/BrandProductsClient";
 import FadeIn from "@/components/ui/FadeIn";
 import TextReveal from "@/components/ui/TextReveal";
@@ -10,7 +10,7 @@ import TextReveal from "@/components/ui/TextReveal";
 // cold-render cost; a brand added later (no redeploy yet) still renders
 // and caches itself on its first visit, since dynamicParams defaults to true.
 export async function generateStaticParams() {
-  const brands = await getBrands();
+  const brands = await getPublicBrands();
   return brands.map((b) => ({ slug: b.slug }));
 }
 
@@ -20,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const brand = await getBrandBySlug(slug);
+  const brand = await getPublicBrandBySlug(slug);
   if (!brand) return {};
 
   const title = `${brand.name} Sneakers`;
@@ -39,10 +39,12 @@ export default async function BrandPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const brand = await getBrandBySlug(slug);
+  const brand = await getPublicBrandBySlug(slug);
   if (!brand) notFound();
 
-  const brandProducts = await getProductsByBrand(brand.slug);
+  const allBrandProducts = await getPublicProductsByBrand(brand.slug);
+  // Sandals live in their own tab on /shop rather than mixed in with shoes here.
+  const brandProducts = allBrandProducts.filter((p) => p.category !== "Sandals");
 
   return (
     <>

@@ -7,7 +7,7 @@ import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/layout/CartDrawer";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 import { CartProvider } from "@/context/CartContext";
-import { getBrands } from "@/lib/data/brands";
+import { getPublicBrands } from "@/lib/data/brands";
 
 // Pages are cached and served instantly instead of hitting Supabase on every
 // visit. The admin panel already calls revalidatePath() on every save, which
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SiteLayout({ children }: { children: ReactNode }) {
-  const brands = await getBrands();
+  const brands = await getPublicBrands();
 
   return (
     <html

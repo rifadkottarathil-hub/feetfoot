@@ -8,8 +8,11 @@ import FilterPanel from "@/components/shop/FilterPanel";
 import ProductCard from "@/components/ui/ProductCard";
 import TextReveal from "@/components/ui/TextReveal";
 
+type Section = "shoes" | "sandals";
+
 export default function ShopClient({ products, brands }: { products: Product[]; brands: Brand[] }) {
   const searchParams = useSearchParams();
+  const [section, setSection] = useState<Section>("shoes");
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -17,6 +20,7 @@ export default function ShopClient({ products, brands }: { products: Product[]; 
     const brandParam = searchParams.get("brand");
     const categoryParam = searchParams.get("category") as ProductCategory | null;
     const saleParam = searchParams.get("sale");
+    const sectionParam = searchParams.get("section");
 
     // One-time sync from the initial URL (e.g. links from the brand strip or promo tiles).
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -26,11 +30,22 @@ export default function ShopClient({ products, brands }: { products: Product[]; 
       categories: categoryParam ? [categoryParam] : prev.categories,
       saleOnly: saleParam === "true" ? true : prev.saleOnly,
     }));
+    if (sectionParam === "sandals") {
+      setSection("sandals");
+    }
     // Only read the URL once, on first load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filtered = applyFilters(products, filters);
+  function switchSection(next: Section) {
+    setSection(next);
+    setFilters(DEFAULT_FILTERS);
+  }
+
+  const sectionProducts = products.filter((p) =>
+    section === "sandals" ? p.category === "Sandals" : p.category !== "Sandals"
+  );
+  const filtered = applyFilters(sectionProducts, filters);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8">
@@ -42,6 +57,26 @@ export default function ShopClient({ products, brands }: { products: Product[]; 
           className="block font-heading text-2xl font-extrabold sm:text-3xl"
         />
         <p className="text-sm text-ink/50">{filtered.length} products</p>
+      </div>
+
+      <div className="relative mb-6 grid grid-cols-2 border-b border-line">
+        {(["shoes", "sandals"] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => switchSection(s)}
+            className={`cursor-pointer py-4 text-center text-sm font-bold uppercase tracking-wide transition-colors ${
+              section === s ? "text-ink" : "text-ink/40 hover:text-ink/70"
+            }`}
+          >
+            {s === "shoes" ? "Shoes" : "Sandals"}
+          </button>
+        ))}
+        <span
+          aria-hidden="true"
+          className={`absolute bottom-0 left-0 h-[2px] w-1/2 bg-accent transition-transform duration-300 ease-out ${
+            section === "sandals" ? "translate-x-full" : "translate-x-0"
+          }`}
+        />
       </div>
 
       <div className="mb-6 flex items-center justify-between gap-4 border-y border-line py-3">
@@ -67,7 +102,12 @@ export default function ShopClient({ products, brands }: { products: Product[]; 
 
       <div className="grid grid-cols-1 gap-10 min-[992px]:grid-cols-[240px_1fr]">
         <aside className="hidden min-[992px]:block">
-          <FilterPanel filters={filters} onChange={setFilters} brands={brands} />
+          <FilterPanel
+            filters={filters}
+            onChange={setFilters}
+            brands={brands}
+            hideCategoryFilter={section === "sandals"}
+          />
         </aside>
 
         <div>
@@ -111,7 +151,12 @@ export default function ShopClient({ products, brands }: { products: Product[]; 
             &times;
           </button>
         </div>
-        <FilterPanel filters={filters} onChange={setFilters} brands={brands} />
+        <FilterPanel
+          filters={filters}
+          onChange={setFilters}
+          brands={brands}
+          hideCategoryFilter={section === "sandals"}
+        />
         <button
           onClick={() => setSheetOpen(false)}
           className="mt-8 w-full cursor-pointer bg-accent py-3 text-sm font-bold uppercase tracking-wide text-white"

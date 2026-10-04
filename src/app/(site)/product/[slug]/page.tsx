@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProducts, getProductBySlug, getRelatedProducts } from "@/lib/data/products";
+import { getPublicProducts, getPublicProductBySlug, getRelatedProducts } from "@/lib/data/products";
 import ProductDetail from "@/components/product/ProductDetail";
 
 // Pre-renders every current product at build time so visitors never pay a
 // cold-render cost; a product added later (no redeploy yet) still renders
 // and caches itself on its first visit, since dynamicParams defaults to true.
 export async function generateStaticParams() {
-  const products = await getProducts();
+  const products = await getPublicProducts();
   return products.map((p) => ({ slug: p.slug }));
 }
 
@@ -17,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await getPublicProductBySlug(slug);
   if (!product) return {};
 
   const title = `${product.brandName} ${product.name} | Foot Feet India`;
@@ -36,7 +36,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [product, allProducts] = await Promise.all([getProductBySlug(slug), getProducts()]);
+  const [product, allProducts] = await Promise.all([getPublicProductBySlug(slug), getPublicProducts()]);
   if (!product) notFound();
 
   const relatedProducts = getRelatedProducts(product, allProducts, 4);

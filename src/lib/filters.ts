@@ -2,8 +2,8 @@ import type { Product, ProductCategory } from "@/lib/types";
 
 export const ALL_CATEGORIES: ProductCategory[] = ["Running", "Lifestyle", "Basketball", "Training"];
 export const ALL_SIZES = ["UK 6", "UK 7", "UK 8", "UK 9", "UK 10", "UK 11", "UK 12"];
-export const PRICE_MIN = 3000;
-export const PRICE_MAX = 18000;
+export const PRICE_MIN = 2000;
+export const PRICE_MAX = 22000;
 
 export type SortOption = "newest" | "price-asc" | "price-desc";
 

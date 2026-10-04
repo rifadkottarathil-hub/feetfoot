@@ -1,5 +1,7 @@
 import { getPublicSupabase } from "@/lib/supabase/public";
 import { getBrandBySlug } from "@/lib/data/brands";
+import { DEMO_MODE } from "@/lib/demoMode";
+import { DEMO_PRODUCTS } from "@/lib/data/demoData";
 import type { Product, ProductCategory } from "@/lib/types";
 
 const PRODUCT_SELECT = "*, brands(id, name, slug, short_description)";
@@ -89,6 +91,23 @@ export async function getProductsByBrand(brandSlug: string): Promise<Product[]> 
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map((row) => mapProductRow(row as unknown as ProductRow));
+}
+
+// Used by the public storefront only (never /admin), so demo mode never
+// affects what the admin panel reads or writes.
+export async function getPublicProducts(): Promise<Product[]> {
+  if (DEMO_MODE) return DEMO_PRODUCTS;
+  return getProducts();
+}
+
+export async function getPublicProductBySlug(slug: string): Promise<Product | null> {
+  if (DEMO_MODE) return DEMO_PRODUCTS.find((p) => p.slug === slug) ?? null;
+  return getProductBySlug(slug);
+}
+
+export async function getPublicProductsByBrand(brandSlug: string): Promise<Product[]> {
+  if (DEMO_MODE) return DEMO_PRODUCTS.filter((p) => p.brandSlug === brandSlug);
+  return getProductsByBrand(brandSlug);
 }
 
 export function getRelatedProducts(product: Product, allProducts: Product[], count = 4): Product[] {

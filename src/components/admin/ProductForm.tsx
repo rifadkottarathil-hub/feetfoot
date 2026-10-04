@@ -6,7 +6,7 @@ import type { ProductFormState } from "@/app/admin/(protected)/products/actions"
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import SmartImage from "@/components/ui/SmartImage";
 
-const CATEGORIES: ProductCategory[] = ["Running", "Lifestyle", "Basketball", "Training"];
+const CATEGORIES: ProductCategory[] = ["Running", "Lifestyle", "Basketball", "Training", "Sandals"];
 const initialState: ProductFormState = {};
 
 export default function ProductForm({

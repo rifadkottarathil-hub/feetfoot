@@ -7,13 +7,14 @@ interface FilterPanelProps {
   filters: FilterState;
   onChange: (filters: FilterState) => void;
   brands: Brand[];
+  hideCategoryFilter?: boolean;
 }
 
 function toggleValue<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
-export default function FilterPanel({ filters, onChange, brands }: FilterPanelProps) {
+export default function FilterPanel({ filters, onChange, brands, hideCategoryFilter }: FilterPanelProps) {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -45,27 +46,29 @@ export default function FilterPanel({ filters, onChange, brands }: FilterPanelPr
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend className="mb-3 text-xs font-bold uppercase tracking-wide text-ink/50">Category</legend>
-        <div className="flex flex-col gap-2">
-          {ALL_CATEGORIES.map((category) => (
-            <label key={category} className="flex cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={filters.categories.includes(category)}
-                onChange={() =>
-                  onChange({
-                    ...filters,
-                    categories: toggleValue<ProductCategory>(filters.categories, category),
-                  })
-                }
-                className="h-4 w-4 accent-accent"
-              />
-              {category}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      {!hideCategoryFilter && (
+        <fieldset>
+          <legend className="mb-3 text-xs font-bold uppercase tracking-wide text-ink/50">Category</legend>
+          <div className="flex flex-col gap-2">
+            {ALL_CATEGORIES.map((category) => (
+              <label key={category} className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={filters.categories.includes(category)}
+                  onChange={() =>
+                    onChange({
+                      ...filters,
+                      categories: toggleValue<ProductCategory>(filters.categories, category),
+                    })
+                  }
+                  className="h-4 w-4 accent-accent"
+                />
+                {category}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
 
       <fieldset>
         <legend className="mb-3 text-xs font-bold uppercase tracking-wide text-ink/50">

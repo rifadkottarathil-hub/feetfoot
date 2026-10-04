@@ -1,4 +1,4 @@
-export type ProductCategory = "Running" | "Lifestyle" | "Basketball" | "Training";
+export type ProductCategory = "Running" | "Lifestyle" | "Basketball" | "Training" | "Sandals";
 
 export interface Brand {
   id: string;
